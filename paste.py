@@ -4,6 +4,7 @@ import sys
 import xmlrpclib
 import optparse
 from pprint import pprint
+import inspect
 
 
 class ActionFailedException(Exception):
@@ -41,7 +42,12 @@ class Action(object):
         return self.__getattribute__(method)()
 
     def actionAddPaste(self):
-        '''Add paste to the server given with -s/--server'''
+        '''Add paste to the server: '1.line' '2.line'
+
+        default     Read the paste from stdin.
+        [text]      Every argument on the commandline will be interpreted as
+                    a seperate line of the paste.
+        '''
         server = self._createProxy()
         o = self.opts_
         code = self.args_
@@ -53,14 +59,20 @@ class Action(object):
         return (result['statusmessage'], result)
 
     def actionDelPaste(self):
-        '''Delete paste from server'''
+        '''Delete paste from server: <digest>
+
+        <digest>    Digest of the paste you want to remove.
+        '''
         digest = self.args_.pop(0)
 
         result = self._callProxy(lambda s: s.paste.deletePaste(digest))
         return (result['statusmessage'], result)
 
     def actionGetPaste(self):
-        '''Get paste from server'''
+        '''Get paste from server: <id>
+
+        <id>        Id of the paste you want to receive.
+        '''
         id = self.args_.pop(0)
 
         result = self._callProxy(lambda s: s.paste.getPaste(id))
@@ -80,14 +92,21 @@ if __name__ == "__main__":
                    'actionDelPaste del d rm',
                    'actionGetPaste get g',
                    'actionGetLangs getlangs gl langs l' ]
-    actions = {}
+    actions_r = {}
     for i in action_spec:
         tmp = i.split()
         cmd = tmp.pop(0)
-        for i in tmp:
-            actions[i] = cmd
+        actions_r[cmd] = tmp
+    actions = {}
+    for (k,v) in actions_r.items():
+        for i in v:
+            actions[i] = k
 
-    parser = optparse.OptionParser(usage="usage: %prog [options] ACTION <args>")
+    usage = "usage: %prog [options] ACTION <args>\n\n" +\
+            "actions:\n" +\
+            "\n".join(["%12s\t%s" % (v[0], inspect.getdoc(getattr(Action, k)).split('\n')[0]) \
+                for (k,v) in actions_r.items()])
+    parser = optparse.OptionParser(usage=usage)
     parser.add_option('-n', '--name', default='anonymous', help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich the paste should expire')
