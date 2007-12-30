@@ -6,11 +6,14 @@ import optparse
 
 
 class ActionFailedException(Exception):
-    def __init__(self, errormsg):
+    def __init__(self, errormsg, ret):
         Exception.__init__(self)
         self.errormsg_ = errormsg
+        self.ret_ = ret
     def what(self):
         return self.errormsg_
+    def dwhat(self):
+        return self.ret_
 
 
 class Action(object):
@@ -23,23 +26,24 @@ class Action(object):
         return xmlrpclib.ServerProxy(self.opts_.server)
 
     def _callProxy(self, functor, server=None):
-        if not server: server = self._createProxy()
+        if not server:
+            server = self._createProxy()
         ret = functor(server)
         if ret['rc'] != 0:
-            raise ActionFailedException(ret['statusmessage'])
+            raise ActionFailedException(ret['statusmessage'], ret)
         return ret
 
     def call(self, method):
         self.__getattribute__(method)()
 
     def actionAddPaste(self):
-        server = self._createProxy(self.opts_)
+        server = self._createProxy()
         o = self.opts_
         code = self.args_
         if len(self.args_) == 0:
             code = [ i.strip() for i in sys.stdin.readlines() ]
         code = '\n'.join(code)
-        result = _callProxy(lambda server: server.paste.addPaste(code, o.name, o.expire * 3600, o.lang),
+        result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang),
                             server)
         print result
 
@@ -52,11 +56,11 @@ class Action(object):
     def actionGetPaste(self):
         id = self.args_.pop(0)
 
-        result = self._callProxy(lambda server: server.paste.getPaste(id))
+        result = self._callProxy(lambda s: s.paste.getPaste(id))
         print result
 
     def actionGetLangs(self):
-        result = self._callProxy(lambda server: server.paste.getLanguages())
+        result = self._callProxy(lambda s: s.paste.getLanguages())
         print result
 
 
@@ -77,9 +81,10 @@ if __name__ == "__main__":
     parser.add_option('-n', '--name', default='anonymous', help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich the paste should expire')
-    parser.add_option('-l', '--lang', default='plain', help='Type of language to highlight')
+    parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
     parser.add_option('-s', '--server', default='http://paste.snow-crash.org/server.pl',
             help='Paste server')
+    parser.add_option('-v', '--verbose', action='count', help='More output')
     (opts, args) = parser.parse_args()
 
     if len(args) == 0:
@@ -91,5 +96,7 @@ if __name__ == "__main__":
             action.call(actions[cmd])
         except ActionFailedException, e:
             print 'Server Error:', e.what()
+            if opts.verbose >0:
+                print e.dwhat()
     else:
         parser.error('Unknown action: %s' % args[0])
