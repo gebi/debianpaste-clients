@@ -3,17 +3,16 @@
 import sys
 import xmlrpclib
 import optparse
+from pprint import pprint
 
 
 class ActionFailedException(Exception):
     def __init__(self, errormsg, ret):
-        Exception.__init__(self)
-        self.errormsg_ = errormsg
-        self.ret_ = ret
+        Exception.__init__(self, errormsg, ret)
     def what(self):
-        return self.errormsg_
+        return self.args[0]
     def dwhat(self):
-        return self.ret_
+        return self.args[1]
 
 
 class Action(object):
@@ -99,6 +98,6 @@ if __name__ == "__main__":
         except ActionFailedException, e:
             print 'Server Error:', e.what()
             if opts.verbose >0:
-                print e.dwhat()
+                pprint(e.dwhat())
     else:
         parser.error('Unknown action: %s' % args[0])
