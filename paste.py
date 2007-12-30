@@ -25,7 +25,7 @@ class Action(object):
         return xmlrpclib.ServerProxy(self.opts_.server)
 
     def _callProxy(self, functor, server=None):
-        if not server:
+        if server is None:
             server = self._createProxy()
         ret = functor(server)
         if ret['rc'] != 0:
@@ -33,7 +33,7 @@ class Action(object):
         return ret
 
     def call(self, method):
-        self.__getattribute__(method)()
+        return self.__getattribute__(method)()
 
     def actionAddPaste(self):
         server = self._createProxy()
@@ -44,23 +44,23 @@ class Action(object):
         code = '\n'.join(code)
         result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang),
                             server)
-        print result
+        return (result['statusmessage'], result)
 
     def actionDelPaste(self):
         digest = self.args_.pop(0)
 
-        server = _createProxy(self.opts_)
-        result = server.paste.deletePaste(digest)
+        result = self._callProxy(lambda s: s.paste.deletePaste(digest))
+        return (result['statusmessage'], result)
 
     def actionGetPaste(self):
         id = self.args_.pop(0)
 
         result = self._callProxy(lambda s: s.paste.getPaste(id))
-        print result
+        return (result['code'], result)
 
     def actionGetLangs(self):
         result = self._callProxy(lambda s: s.paste.getLanguages())
-        print result
+        return ('\n'.join(result['langs']), result)
 
 
 ##
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
     parser.add_option('-s', '--server', default='http://paste.snow-crash.org/server.pl',
             help='Paste server')
-    parser.add_option('-v', '--verbose', action='count', help='More output')
+    parser.add_option('-v', '--verbose', action='count', default=0, help='More output')
     (opts, args) = parser.parse_args()
 
     if len(args) == 0:
@@ -94,10 +94,15 @@ if __name__ == "__main__":
         cmd = args.pop(0)
         action = Action(cmd, args, opts)
         try:
-            action.call(actions[cmd])
+            (msg, ret) = action.call(actions[cmd])
+            if opts.verbose == 0:
+                print msg
+            else:
+                pprint(ret)
         except ActionFailedException, e:
-            print 'Server Error:', e.what()
+            sys.stderr.write('Server Error: %s\n' % e.what())
             if opts.verbose >0:
                 pprint(e.dwhat())
+            sys.exit(1)
     else:
         parser.error('Unknown action: %s' % args[0])
