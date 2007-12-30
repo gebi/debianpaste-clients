@@ -44,9 +44,9 @@ class Action(object):
     def actionAddPaste(self):
         '''Add paste to the server: <1.line> <2.line> ...
 
-        default     Read the paste from stdin.
+        default     Read paste from stdin.
         [text]      Every argument on the commandline will be interpreted as
-                    a seperate line of the paste.
+                    a seperate line of paste.
         '''
         server = self._createProxy()
         o = self.opts_
@@ -61,7 +61,7 @@ class Action(object):
     def actionDelPaste(self):
         '''Delete paste from server: <digest>
 
-        <digest>    Digest of the paste you want to remove.
+        <digest>    Digest of paste you want to remove.
         '''
         digest = self.args_.pop(0)
 
@@ -71,7 +71,7 @@ class Action(object):
     def actionGetPaste(self):
         '''Get paste from server: <id>
 
-        <id>        Id of the paste you want to receive.
+        <id>        Id of paste you want to receive.
         '''
         id = self.args_.pop(0)
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-n', '--name', default='anonymous', help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
-            help='Time at wich the paste should expire')
+            help='Time at wich paste should expire')
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
     parser.add_option('-s', '--server', default='http://paste.snow-crash.org/server.pl',
             help='Paste server')
