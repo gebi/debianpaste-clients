@@ -42,7 +42,7 @@ class Action(object):
         return self.__getattribute__(method)()
 
     def actionAddPaste(self):
-        '''Add paste to the server: '1.line' '2.line'
+        '''Add paste to the server: <1.line> <2.line> ...
 
         default     Read the paste from stdin.
         [text]      Every argument on the commandline will be interpreted as
@@ -83,6 +83,25 @@ class Action(object):
         result = self._callProxy(lambda s: s.paste.getLanguages())
         return ('\n'.join(result['langs']), result)
 
+    def actionHelp(self):
+        '''Print more verbose help about specific action: <action>
+        
+        <action>    Topic on which you need more verbose help.
+        '''
+        alias = self.args_.pop(0)
+
+        fun = actions[alias]
+        print inspect.getdoc(self.__getattribute__(fun))
+        print "\naliase: " + " ".join([i for i in actions_r[fun] if i != alias])
+        sys.exit(0)
+
+
+# actionAddPaste -> [add, a]
+actions_r = {}
+
+# add -> actionAddPaste
+# a   -> actionAddPaste
+actions   = {}
 
 ##
 # MAIN
@@ -91,13 +110,12 @@ if __name__ == "__main__":
     action_spec = ['actionAddPaste add a',
                    'actionDelPaste del d rm',
                    'actionGetPaste get g',
-                   'actionGetLangs getlangs gl langs l' ]
-    actions_r = {}
+                   'actionGetLangs getlangs gl langs l',
+                   'actionHelp     help']
     for i in action_spec:
         tmp = i.split()
         cmd = tmp.pop(0)
         actions_r[cmd] = tmp
-    actions = {}
     for (k,v) in actions_r.items():
         for i in v:
             actions[i] = k
