@@ -7,11 +7,14 @@ from pprint import pprint
 
 
 class ActionFailedException(Exception):
+    '''Thrown if server returned an error'''
     def __init__(self, errormsg, ret):
         Exception.__init__(self, errormsg, ret)
     def what(self):
+        '''Get errormessage'''
         return self.args[0]
     def dwhat(self):
+        '''Get more verbose errormessage'''
         return self.args[1]
 
 
@@ -25,17 +28,20 @@ class Action(object):
         return xmlrpclib.ServerProxy(self.opts_.server)
 
     def _callProxy(self, functor, server=None):
-        if server is None:
-            server = self._createProxy()
+        '''Wrapper for xml-rpc calls to server which throws an
+           ActionFailedException on error'''
+        s = server or self._createProxy()
         ret = functor(server)
         if ret['rc'] != 0:
             raise ActionFailedException(ret['statusmessage'], ret)
         return ret
 
     def call(self, method):
+        '''External Interface to call the appropriate action'''
         return self.__getattribute__(method)()
 
     def actionAddPaste(self):
+        '''Add paste to the server given with -s/--server'''
         server = self._createProxy()
         o = self.opts_
         code = self.args_
@@ -47,18 +53,21 @@ class Action(object):
         return (result['statusmessage'], result)
 
     def actionDelPaste(self):
+        '''Delete paste from server'''
         digest = self.args_.pop(0)
 
         result = self._callProxy(lambda s: s.paste.deletePaste(digest))
         return (result['statusmessage'], result)
 
     def actionGetPaste(self):
+        '''Get paste from server'''
         id = self.args_.pop(0)
 
         result = self._callProxy(lambda s: s.paste.getPaste(id))
         return (result['code'], result)
 
     def actionGetLangs(self):
+        '''Get supported language highlighting types from server'''
         result = self._callProxy(lambda s: s.paste.getLanguages())
         return ('\n'.join(result['langs']), result)
 
