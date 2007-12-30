@@ -5,53 +5,74 @@ import xmlrpclib
 import optparse
 
 
-def createProxy(opts):
-    return xmlrpclib.ServerProxy(opts.server)
+class ActionFailedException(Exception):
+    def __init__(self, errormsg):
+        Exception.__init__(self)
+        self.errormsg_ = errormsg
+    def what(self):
+        return self.errormsg_
 
-def actionAddPaste(opts, args):
-    cmd = args.pop(0)
 
-    server = createProxy(opts)
-    code = args
-    if len(args) == 0:
-        code = [ i.strip() for i in sys.stdin.readlines() ]
-    code = '\n'.join(code)
-    result = server.paste.addPaste(code, opts.name, opts.expire * 3600, opts.lang)
-    print result
+class Action(object):
+    def __init__(self, cmd, args, opts):
+        self.cmd_  = cmd
+        self.args_ = args
+        self.opts_ = opts
 
-def actionDelPaste(opts, args):
-    cmd = args.pop(0)
-    digest = args.pop(0)
+    def _createProxy(self):
+        return xmlrpclib.ServerProxy(self.opts_.server)
 
-    server = createProxy(opts)
-    result = server.paste.deletePaste(digest)
+    def _callProxy(self, functor, server=None):
+        if not server: server = self._createProxy()
+        ret = functor(server)
+        if ret['rc'] != 0:
+            raise ActionFailedException(ret['statusmessage'])
+        return ret
 
-def actionGetPaste(opts, args):
-    cmd = args.pop(0)
-    id = args.pop(0)
+    def call(self, method):
+        self.__getattribute__(method)()
 
-    server = createProxy(opts)
-    result = server.paste.getPaste(id)
-    print result
+    def actionAddPaste(self):
+        server = self._createProxy(self.opts_)
+        o = self.opts_
+        code = self.args_
+        if len(self.args_) == 0:
+            code = [ i.strip() for i in sys.stdin.readlines() ]
+        code = '\n'.join(code)
+        result = _callProxy(lambda server: server.paste.addPaste(code, o.name, o.expire * 3600, o.lang),
+                            server)
+        print result
 
-def actionGetLangs(opts, args):
-    cmd = args.pop(0)
+    def actionDelPaste(self):
+        digest = self.args_.pop(0)
 
-    server = createProxy(opts)
-    result = server.paste.getLanguages()
-    print result
+        server = _createProxy(self.opts_)
+        result = server.paste.deletePaste(digest)
+
+    def actionGetPaste(self):
+        id = self.args_.pop(0)
+
+        result = self._callProxy(lambda server: server.paste.getPaste(id))
+        print result
+
+    def actionGetLangs(self):
+        result = self._callProxy(lambda server: server.paste.getLanguages())
+        print result
 
 
 ##
 # MAIN
 ##
 if __name__ == "__main__":
-    actions = {'add'     : actionAddPaste,
-               'del'     : actionDelPaste,
-               'rm'      : actionDelPaste,
-               'get'     : actionGetPaste,
-               'getlangs': actionGetLangs,
-               'langs'   : actionGetLangs }
+    action_spec = ['add actionAddPaste', 'del rm actionDelPaste', 'get actionGetPaste',
+                   'getlangs langs actionGetLangs' ]
+    actions = {}
+    for i in action_spec:
+        tmp = i.split()
+        cmd = tmp.pop()
+        for i in tmp:
+            actions[i] = cmd
+
     parser = optparse.OptionParser(usage="usage: %prog [options] ACTION <args>")
     parser.add_option('-n', '--name', default='anonymous', help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
@@ -64,6 +85,11 @@ if __name__ == "__main__":
     if len(args) == 0:
         parser.error('Please provide me with an action')
     elif args[0] in actions:
-        actions[args[0]](opts, args)
+        cmd = args.pop(0)
+        action = Action(cmd, args, opts)
+        try:
+            action.call(actions[cmd])
+        except ActionFailedException, e:
+            print 'Server Error:', e.what()
     else:
         parser.error('Unknown action: %s' % args[0])
