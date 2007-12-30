@@ -68,12 +68,12 @@ class Action(object):
 # MAIN
 ##
 if __name__ == "__main__":
-    action_spec = ['add actionAddPaste', 'del rm actionDelPaste', 'get actionGetPaste',
-                   'getlangs langs actionGetLangs' ]
+    action_spec = ['actionAddPaste add', 'actionDelPaste del rm', 'actionGetPaste get',
+                   'actionGetLangs getlangs langs' ]
     actions = {}
     for i in action_spec:
         tmp = i.split()
-        cmd = tmp.pop()
+        cmd = tmp.pop(0)
         for i in tmp:
             actions[i] = cmd
 
