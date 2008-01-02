@@ -25,8 +25,7 @@ class ActionFailedException(Exception):
 
 
 class Action(object):
-    def __init__(self, cmd, args, opts):
-        self.cmd_  = cmd
+    def __init__(self, args, opts):
         self.args_ = args
         self.opts_ = opts
 
@@ -144,7 +143,7 @@ if __name__ == "__main__":
         parser.error('Please provide me with an action')
     elif args[0] in actions:
         cmd = args.pop(0)
-        action = Action(cmd, args, opts)
+        action = Action(args, opts)
         try:
             (msg, ret) = action.call(actions[cmd])
             if opts.verbose == 0:
