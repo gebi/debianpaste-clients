@@ -36,7 +36,8 @@ class Action(object):
     def _callProxy(self, functor, server=None):
         '''Wrapper for xml-rpc calls to server which throws an
            ActionFailedException on error'''
-        s = server or self._createProxy()
+        if server is None:
+            server = self._createProxy()
         ret = functor(server)
         if ret['rc'] != 0:
             raise ActionFailedException(ret['statusmessage'], ret)
