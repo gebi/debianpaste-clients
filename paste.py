@@ -42,9 +42,9 @@ class Action(object):
             raise ActionFailedException(ret['statusmessage'], ret)
         return ret
 
-    def call(self, method):
+    def call(self, method_name):
         '''External Interface to call the appropriate action'''
-        return self.__getattribute__(method)()
+        return self.__getattribute__(method_name)()
 
     def actionAddPaste(self):
         '''Add paste to the server: <1.line> <2.line> ...
