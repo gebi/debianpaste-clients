@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Filename:      hg-mirror
+# Filename:      paste
 # Purpose:       XmlRpc interface client to paste.debian.net
 # Author:        Michael Gebetsroither <gebi@grml.org>
 # License:       This file is licensed under the GPL v2.
