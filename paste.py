@@ -88,6 +88,36 @@ class Action(object):
         result = self._callProxy(lambda s: s.paste.getLanguages())
         return ('\n'.join(result['langs']), result)
 
+    def actionAddShortUrl(self):
+        '''Add short-URL: <url>
+
+        <url>        Short-URL to add
+        '''
+        url = self.args_.pop(0)
+
+        result = self._callProxy(lambda s: s.paste.addShortURL(url))
+        return (result['url'], result)
+
+    def actionGetShortUrl(self):
+        '''Resolve short-URL: <url>
+
+        <url>        Short-URL to get clicks of
+        '''
+        url = self.args_.pop(0)
+
+        result = self._callProxy(lambda s: s.paste.resolveShortURL(url))
+        return (result['url'], result)
+
+    def actionGetShortUrlClicks(self):
+        '''Get clicks of short-URL: <url>
+
+        <url>        Short-URL to get clicks of
+        '''
+        url = self.args_.pop(0)
+
+        result = self._callProxy(lambda s: s.paste.ShortURLClicks(url))
+        return (result['count'], result)
+
     def actionHelp(self):
         '''Print more verbose help about specific action: <action>
         
@@ -127,6 +157,9 @@ if __name__ == "__main__":
                    'actionDelPaste del d rm',
                    'actionGetPaste get g',
                    'actionGetLangs getlangs gl langs l',
+                   'actionAddShortUrl addurl',
+                   'actionGetShortUrl geturl',
+                   'actionGetShortUrlClicks getclicks',
                    'actionHelp     help']
     for i in action_spec:
         tmp = i.split()
