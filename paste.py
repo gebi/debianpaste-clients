@@ -93,7 +93,10 @@ class Action(object):
         
         <action>    Topic on which you need more verbose help.
         '''
-        alias = self.args_.pop(0)
+        if len(self.args_) < 1:
+            alias = "help"
+        else:
+            alias = self.args_.pop(0)
 
         fun = actions[alias]
         print inspect.getdoc(self.__getattribute__(fun))
