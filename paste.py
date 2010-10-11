@@ -98,9 +98,13 @@ class Action(object):
         else:
             alias = self.args_.pop(0)
 
-        fun = actions[alias]
-        print inspect.getdoc(self.__getattribute__(fun))
-        print "\naliase: " + " ".join([i for i in actions_r[fun] if i != alias])
+        if alias in actions:
+            fun = actions[alias]
+            print inspect.getdoc(self.__getattribute__(fun))
+            print "\naliase: " + " ".join([i for i in actions_r[fun] if i != alias])
+        else:
+            print "Error: No such command - %s" % (alias)
+            OPT_PARSER.print_usage()
         sys.exit(0)
 
 
@@ -110,6 +114,10 @@ actions_r = {}
 # add -> actionAddPaste
 # a   -> actionAddPaste
 actions   = {}
+
+# option parser
+OPT_PARSER = None
+
 
 ##
 # MAIN
@@ -141,6 +149,7 @@ if __name__ == "__main__":
             help='Paste server')
     parser.add_option('-v', '--verbose', action='count', default=0, help='More output')
     (opts, args) = parser.parse_args()
+    OPT_PARSER = parser
 
     if len(args) == 0:
         parser.error('Please provide me with an action')
