@@ -8,7 +8,6 @@
 import sys
 import xmlrpclib
 import optparse
-from pprint import pprint
 import inspect
 
 
@@ -194,11 +193,11 @@ if __name__ == "__main__":
             if opts.verbose == 0:
                 print msg
             else:
-                pprint(ret)
+                print ret
         except ActionFailedException, e:
             sys.stderr.write('Server Error: %s\n' % e.what())
             if opts.verbose >0:
-                pprint(e.dwhat())
+                print e.dwhat()
             sys.exit(1)
     else:
         parser.error('Unknown action: %s' % args[0])
