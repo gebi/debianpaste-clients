@@ -161,9 +161,9 @@ if __name__ == "__main__":
                    'actionGetShortUrlClicks getclicks',
                    'actionHelp     help']
     for i in action_spec:
-        tmp = i.split()
-        cmd = tmp.pop(0)
-        actions_r[cmd] = tmp
+        aliases = i.split()
+        cmd = aliases.pop(0)
+        actions_r[cmd] = aliases
     for (k,v) in actions_r.items():
         for i in v:
             actions[i] = k
