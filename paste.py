@@ -68,7 +68,6 @@ class Action(object):
         <digest>    Digest of paste you want to remove.
         '''
         digest = self.args_.pop(0)
-
         result = self._callProxy(lambda s: s.paste.deletePaste(digest))
         return (result['statusmessage'], result)
 
@@ -78,7 +77,6 @@ class Action(object):
         <id>        Id of paste you want to receive.
         '''
         id = self.args_.pop(0)
-
         result = self._callProxy(lambda s: s.paste.getPaste(id))
         return (result['code'], result)
 
@@ -93,7 +91,6 @@ class Action(object):
         <url>        Short-URL to add
         '''
         url = self.args_.pop(0)
-
         result = self._callProxy(lambda s: s.paste.addShortURL(url))
         return (result['url'], result)
 
@@ -103,7 +100,6 @@ class Action(object):
         <url>        Short-URL to get clicks of
         '''
         url = self.args_.pop(0)
-
         result = self._callProxy(lambda s: s.paste.resolveShortURL(url))
         return (result['url'], result)
 
@@ -113,7 +109,6 @@ class Action(object):
         <url>        Short-URL to get clicks of
         '''
         url = self.args_.pop(0)
-
         result = self._callProxy(lambda s: s.paste.ShortURLClicks(url))
         return (result['count'], result)
 
