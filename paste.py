@@ -172,7 +172,7 @@ if __name__ == "__main__":
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich paste should expire')
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
-    parser.add_option('-s', '--server', default='http://paste.snow-crash.org/server.pl',
+    parser.add_option('-s', '--server', default='http://paste.debian.net/server.pl',
             help='Paste server')
     parser.add_option('-v', '--verbose', action='count', default=0, help='More output')
     (opts, args) = parser.parse_args()
