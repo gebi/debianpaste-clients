@@ -58,7 +58,7 @@ class Action(object):
         if len(self.args_) == 0:
             code = [ i.strip() for i in sys.stdin.readlines() ]
         code = '\n'.join(code)
-        result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang),
+        result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang, o.private),
                             server)
         return (result['statusmessage'], result)
 
@@ -172,6 +172,8 @@ if __name__ == "__main__":
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich paste should expire')
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
+    parser.add_option("-p", "--private", action="store_true", dest="private", default=False,
+                        help='Create hidden paste'),
     parser.add_option('-s', '--server', default='http://paste.debian.net/server.pl',
             help='Paste server')
     parser.add_option('-v', '--verbose', action='count', default=0, help='More output')
