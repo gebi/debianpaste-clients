@@ -9,6 +9,7 @@ import sys
 import xmlrpclib
 import optparse
 import inspect
+import getpass
 
 
 class ActionFailedException(Exception):
@@ -167,8 +168,9 @@ if __name__ == "__main__":
             "actions:\n" +\
             "\n".join(["%12s\t%s" % (v[0], inspect.getdoc(getattr(Action, k)).split('\n')[0]) \
                 for (k,v) in actions_r.items()])
+    running_user = getpass.getuser()
     parser = optparse.OptionParser(usage=usage)
-    parser.add_option('-n', '--name', default='anonymous', help="Name of poster")
+    parser.add_option('-n', '--name', default=running_user, help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich paste should expire')
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
