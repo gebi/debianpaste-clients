@@ -11,6 +11,8 @@ import optparse
 import inspect
 import getpass
 
+# program defaults
+DEFAULT_SERVER='http://paste.debian.net/server.pl'
 
 class ActionFailedException(Exception):
     '''Thrown if server returned an error'''
@@ -176,7 +178,7 @@ if __name__ == "__main__":
     parser.add_option('-l', '--lang', default='Plain', help='Type of language to highlight')
     parser.add_option("-p", "--private", action="count", dest="private", default=0,
                         help='Create hidden paste'),
-    parser.add_option('-s', '--server', default='http://paste.debian.net/server.pl',
+    parser.add_option('-s', '--server', default=DEFAULT_SERVER,
             help='Paste server')
     parser.add_option('-v', '--verbose', action='count', default=0, help='More output')
     (opts, args) = parser.parse_args()
