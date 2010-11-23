@@ -117,7 +117,7 @@ class Action(object):
 
     def actionHelp(self):
         '''Print more verbose help about specific action: <action>
-        
+
         <action>    Topic on which you need more verbose help.
         '''
         if len(self.args_) < 1:
