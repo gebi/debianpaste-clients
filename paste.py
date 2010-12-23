@@ -59,7 +59,7 @@ class Action(object):
         o = self.opts_
         code = self.args_
         if len(self.args_) == 0:
-            code = [ i.strip() for i in sys.stdin.readlines() ]
+            code = [ i.rstrip() for i in sys.stdin.readlines() ]
         code = '\n'.join(code)
         result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang, o.private),
                             server)
