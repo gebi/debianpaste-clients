@@ -32,7 +32,7 @@ class Action(object):
         self.opts_ = opts
 
     def _createProxy(self):
-        return xmlrpclib.ServerProxy(self.opts_.server)
+        return xmlrpclib.ServerProxy(self.opts_.server, verbose=False)
 
     def _callProxy(self, functor, server=None):
         '''Wrapper for xml-rpc calls to server which throws an
