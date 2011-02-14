@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # Filename:      paste
 # Purpose:       XmlRpc interface client to paste.debian.net
-# Author:        Michael Gebetsroither <gebi@grml.org>
-# License:       This file is licensed under the GPL v2.
+# Author:        Michael Gebetsroither <michael@mgeb.org>
+# License:       This file is licensed under the GPL v2+.
 ################################################################################
 
 import sys
