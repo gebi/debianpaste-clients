@@ -1,0 +1,4 @@
+- past web-view url into x-buffer
+- paste file without cat
+- automatic file detection from file extension
+- 'add' per default without explicitly specifying
