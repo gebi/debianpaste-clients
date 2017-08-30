@@ -59,7 +59,11 @@ class Action(object):
         o = self.opts_
         code = self.args_
         if len(self.args_) == 0:
-            code = [ i.rstrip() for i in sys.stdin.readlines() ]
+            if o.file is None:
+                input_code = sys.stdin
+            else:
+                input_code = open(o.file)
+            code = [ i.rstrip() for i in input_code.readlines() ]
         code = '\n'.join(code)
         result = self._callProxy(lambda s: s.paste.addPaste(code, o.name, o.expire * 3600, o.lang, o.private),
                             server)
@@ -172,6 +176,7 @@ if __name__ == "__main__":
                 for (k,v) in actions_r.items()])
     running_user = getpass.getuser()
     parser = optparse.OptionParser(usage=usage)
+    parser.add_option('-f', '--file', default=None, help="Path to file")
     parser.add_option('-n', '--name', default=running_user, help="Name of poster")
     parser.add_option('-e', '--expire', type=int, default=72, metavar='HOURS',
             help='Time at wich paste should expire')
