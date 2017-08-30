@@ -185,8 +185,8 @@ if __name__ == "__main__":
     OPT_PARSER = parser
 
     if len(args) == 0:
-        parser.error('Please provide me with an action')
-    elif args[0] in actions:
+        args.append('add')
+    if args[0] in actions:
         cmd = args.pop(0)
         action = Action(args, opts)
         try:
